@@ -16,7 +16,6 @@ public class Launcher {
 		System.out.println("This is the Launcher - Main class");
 		
 		//Starting the RepairApache
-		//Checking commit
 		RepairApache.repairApache();
 	
 		
