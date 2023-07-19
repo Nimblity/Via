@@ -27,22 +27,18 @@ public class Launcher {
 			File packageObj = new File(newPackageLocation);
 			File[] packages = packageObj.listFiles();
 			for (File software : packages) {
-				String softwareName = software.getName();
-
-				switch (softwareName) {
-				case "httpd-2.4.57-win64-VS17.zip ": {
+				String softwareName = software.getName(); 
+				
+				if(softwareName.contains(prop.getProperty(RepairConstants.PACKAGE_APACHE))) {
 					logger.info("Apache Repair - Starts");
 					RepairApache.repairApache(software);
 					logger.info("Apache Repair - Ends");
-					break;
-				}
-
 				}
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
+		logger.info("===========Ending repair===========");
 	}
 }

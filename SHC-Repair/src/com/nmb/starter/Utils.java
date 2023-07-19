@@ -62,7 +62,7 @@ public class Utils {
 		return status;
 	}
 
-	public static boolean moveDirectory(String sourceFileLocation, String targetFileLocation) {
+	public static boolean moveApacheDirectory(String sourceFileLocation, String targetFileLocation) {
 		
 		boolean status = false;
 		targetFileLocation = targetFileLocation + RepairConstants.BACKSLASH_TWO + prop.getProperty(RepairConstants.APACHE_DIR_NAME); ;
@@ -122,7 +122,6 @@ public class Utils {
 				zipEntry = zipInputStream.getNextEntry();
 			}
 
-			System.out.println("Zip file successfully extracted.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -133,7 +132,6 @@ public class Utils {
 	public static Logger getLogger() {
 		Logger logger = Logger.getLogger("MyLog");
 		try {
-			
 			FileHandler filehandler = new FileHandler(prop.getProperty(RepairConstants.LOG_FILE_LOCATION));
 			logger.addHandler(filehandler);
 			filehandler.setFormatter(new SimpleFormatter());
@@ -142,9 +140,7 @@ public class Utils {
 			logger.log(Level.WARNING, "Exception : " + e);
 			e.printStackTrace();
 		}
-
 		return logger;
-
 	}
 
 	// Creates the backup folder

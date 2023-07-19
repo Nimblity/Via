@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.nmb.starter.RepairConstants;
@@ -32,12 +33,11 @@ public class RepairApache {
 		try {
 			String filepath = file.getAbsoluteFile().toString();
 			Utils.unzipFile(filepath, unzippedFilepath);
-			logger.info("Unizpping of Apache - Ends");
-
+			logger.info(">>>>>Unizpping of Apache - Ends");
 			extracteDirName = executeConfDirExchange(file);
 			stopApacheService();
 			executeApacheExchange(extracteDirName);
-			//deployApache(extracteDirName);
+			deployApache(extracteDirName);
 			startApacheService();
 
 		} catch (Exception e) {
@@ -49,23 +49,24 @@ public class RepairApache {
 	 * This will start the Apache Service
 	 */
 	private static void startApacheService() {
-		logger.info(">>>>>Apache Windows Service : Started");
 
+		logger.info(">>>>>Apache Windows Service : Started");
 	}
 
 	/**
 	 * This will check stop the Apache service
 	 */
 	private static void stopApacheService() {
-		logger.info(">>>>>Apache Windows Service : Stoppped");
 
+		logger.info(">>>>>Apache Windows Service : Stoppped");
 	}
 
 	/**
 	 * 
 	 * @param extractedDirName
+	 * @throws InterruptedException 
 	 */
-	private static void executeApacheExchange(String extractedDirName) {
+	private static void executeApacheExchange(String extractedDirName) throws InterruptedException {
 
 		logger.info(">>>>>Apache Exchange : Started");
 		// 1. Move the old Apache from VMPROGRAMS to BACKUP
@@ -73,8 +74,12 @@ public class RepairApache {
 				+ ApacheDirName;
 		String destDirLocaiton = prop.getProperty(RepairConstants.NEW_PACKAGE_LOCATION) + RepairConstants.BACKSLASH_TWO
 				+ RepairConstants.BACKUP;
-		Utils.moveDirectory(sourceDirLocation, destDirLocaiton);
-		
+		Utils.moveApacheDirectory(sourceDirLocation, destDirLocaiton);
+		File destFile = new File(sourceDirLocation);
+		if(destFile.exists()) {
+			destFile.delete();
+			TimeUnit.SECONDS.sleep(5);
+		}
 		logger.info(">>>>>Apache Exchange : Ended");
 
 	}
@@ -84,19 +89,31 @@ public class RepairApache {
 	 */
 	private static void deployApache(String extractedDirName) {
 		logger.info(">>>>> Apache Deployment : STARTS");
-		String sourceDirLocation = prop.getProperty(RepairConstants.NEW_PACKAGE_LOCATION) + RepairConstants.BACKSLASH_TWO
-				+ extractedDirName + RepairConstants.BACKSLASH_TWO + prop.getProperty(RepairConstants.APACHE_DIR_NAME);
+		String sourceDirLocation = prop.getProperty(RepairConstants.NEW_PACKAGE_LOCATION)
+				+ RepairConstants.BACKSLASH_TWO + extractedDirName + RepairConstants.BACKSLASH_TWO
+				+ prop.getProperty(RepairConstants.APACHE_DIR_NAME);
+
+//		String destDirLocation = prop.getProperty(RepairConstants.VMPROGRAMS_LOCATION)+RepairConstants.BACKSLASH_TWO
+//				+prop.getProperty(RepairConstants.APACHE_DIR_NAME);
+		String destDirLocation = prop.getProperty(RepairConstants.VMPROGRAMS_LOCATION);
+		Path sourcePath = Paths.get(sourceDirLocation);
+		Path destinationPath = Paths.get(destDirLocation);
 		
-		String destDirLocation = prop.getProperty(RepairConstants.VMPROGRAMS_LOCATION) + RepairConstants.BACKSLASH_TWO + prop.getProperty(RepairConstants.APACHE_DIR_NAME);
-		Utils.copyDirectory(sourceDirLocation, destDirLocation);
 		
+		try {
+			
+			 Files.move(sourcePath, destinationPath.resolve(sourcePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		logger.info(">>>>> Apache Deployment : ENDS");
 	}
 
 	private static String executeConfDirExchange(File file) {
 		File fobj = new File(file.getAbsoluteFile().toString());
 		String extractedDirName = fobj.getName().substring(0, fobj.getName().lastIndexOf(RepairConstants.DOT));
-		logger.info("Exchange of Config - Starts");
+		logger.info(">>>>>Exchange of Config - Starts");
 		String ApacheDirLocation = vmprogramsAddress + RepairConstants.BACKSLASH_TWO + ApacheDirName;
 		File fObj = new File(ApacheDirLocation);
 		File[] listofFiles = fObj.listFiles();
@@ -108,13 +125,8 @@ public class RepairApache {
 								+ apachConfDirName);
 				break;
 			}
-
 		}
 		logger.info(">>>>>>Exchange of config - Ends");
 		return extractedDirName;
-
 	}
-
-	
-
 }
