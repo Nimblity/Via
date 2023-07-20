@@ -35,10 +35,12 @@ public class RepairApache {
 			Utils.unzipFile(filepath, unzippedFilepath);
 			logger.info(">>>>>Unizpping of Apache - Ends");
 			extracteDirName = executeConfDirExchange(file);
-			stopApacheService();
+			Utils.toggleService(prop.getProperty(RepairConstants.SERVICE_STOP),
+					prop.getProperty(RepairConstants.APACHE_SERVICE_NAME));
 			executeApacheExchange(extracteDirName);
 			deployApache(extracteDirName);
-			startApacheService();
+			Utils.toggleService(prop.getProperty(RepairConstants.SERVICE_START),
+					prop.getProperty(RepairConstants.APACHE_SERVICE_NAME));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -64,7 +66,7 @@ public class RepairApache {
 	/**
 	 * 
 	 * @param extractedDirName
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	private static void executeApacheExchange(String extractedDirName) throws InterruptedException {
 
@@ -76,7 +78,7 @@ public class RepairApache {
 				+ RepairConstants.BACKUP;
 		Utils.moveApacheDirectory(sourceDirLocation, destDirLocaiton);
 		File destFile = new File(sourceDirLocation);
-		if(destFile.exists()) {
+		if (destFile.exists()) {
 			destFile.delete();
 			TimeUnit.SECONDS.sleep(5);
 		}
@@ -98,11 +100,11 @@ public class RepairApache {
 		String destDirLocation = prop.getProperty(RepairConstants.VMPROGRAMS_LOCATION);
 		Path sourcePath = Paths.get(sourceDirLocation);
 		Path destinationPath = Paths.get(destDirLocation);
-		
-		
+
 		try {
-			
-			 Files.move(sourcePath, destinationPath.resolve(sourcePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+
+			Files.move(sourcePath, destinationPath.resolve(sourcePath.getFileName()),
+					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

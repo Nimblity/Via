@@ -25,6 +25,12 @@ public class RepairConstants {
 	//PackageNames:
 	public static final String PACKAGE_APACHE = "package_Apache";
 	
+	//Service Names:
+	public static final String APACHE_SERVICE_NAME = "apacheServiceName";
+	
+	//Toggle Service
+	public static final String SERVICE_START = "serviceStart";	
+	public static final String SERVICE_STOP = "serviceStop";
 	
 	//Text Separators:
 	public static final String BACKSLASH_TWO = "\\";

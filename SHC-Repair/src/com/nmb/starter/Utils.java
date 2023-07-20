@@ -3,15 +3,16 @@
  */
 package com.nmb.starter;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -154,6 +155,56 @@ public class Utils {
 			dir_backupFolder.mkdir();
 
 		}
+	}
+	
+	public static void toggleService(String action, String serviceName) {
+		try {
+			ProcessBuilder processBuilder = new ProcessBuilder("sc",action, serviceName);
+            Process process = processBuilder.start();
+
+			// Wait for the process to complete
+            int exitCode = process.waitFor();
+
+			// Read the output from the process
+			if (exitCode == 0) {
+                System.out.println("Service stopped successfully.");
+            } else {
+                System.out.println("Failed to stop the service. Exit code: " + exitCode);
+            }
+
+
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void checkWindowsServiceState(String serviceName) {
+		try {
+			ProcessBuilder processBuilder = new ProcessBuilder("sc", "query", serviceName);
+            Process process = processBuilder.start();
+
+            // Read the output of the command
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            StringBuilder output = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            // Wait for the process to complete
+            int exitCode = process.waitFor();
+            System.out.println("exitCode :: "+exitCode);
+
+            if (exitCode == 0) {
+                // Print the output of the command
+                System.out.println("Service state:\n" + output.toString());
+            } else {
+                System.out.println("Failed to check the service state. Exit code: " + exitCode);
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

@@ -32,6 +32,7 @@ public class Launcher {
 				if(softwareName.contains(prop.getProperty(RepairConstants.PACKAGE_APACHE))) {
 					logger.info("Apache Repair - Starts");
 					RepairApache.repairApache(software);
+					Utils.checkWindowsServiceState(RepairConstants.APACHE_SERVICE_NAME);
 					logger.info("Apache Repair - Ends");
 				}
 			}
